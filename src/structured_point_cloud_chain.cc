@@ -123,6 +123,8 @@ StructuredPointCloudChain::KnnQuery(NanoMapKnnArgs const &args) const {
                                                           // after first
                                                           // transform
   // Vector3 search_position_rdf = _body_to_rdf * search_position;
+  Vector3 velocity_rdf = 
+      _body_to_rdf * args.velocity_current_body_frame;
 
   Vector3 sigma_rdf =
       _body_to_rdf *
@@ -133,6 +135,7 @@ StructuredPointCloudChain::KnnQuery(NanoMapKnnArgs const &args) const {
   uint32_t first_frame_id;
   Vector3 first_sigma_rdf;
   Vector3 first_search_position_rdf;
+  Vector3 first_velocity_rdf;
 
   // search through chain
   uint32_t depth = 0;
@@ -140,10 +143,12 @@ StructuredPointCloudChain::KnnQuery(NanoMapKnnArgs const &args) const {
     // transform to previous body frame
     search_position_rdf =
         i->ApplyEdgeTransform(search_position_rdf, i->edge_rdf);
-    sigma_rdf = i->ApplyEdgeRotation(sigma_rdf, i->edge_rdf_rotation_only);
+    velocity_rdf = i->ApplyEdgeRotation(velocity_rdf, i->edge_rdf_rotation_only);
+    // JL: commented out, sigma_rdf is zeroed out in EvaluateFov
+    // sigma_rdf = i->ApplyEdgeRotation(sigma_rdf, i->edge_rdf_rotation_only);
     // double sigma_each_direction = 0.013; // sigma increase up to 2 meters
     // over 150
-    sigma_rdf = sigma_rdf + Vector3(0.1, 0.1, 0.1);
+    // sigma_rdf = sigma_rdf + Vector3(0.1, 0.1, 0.1);
 
     // transform into sensor rdf frame
     // search_position_rdf =
@@ -162,6 +167,7 @@ StructuredPointCloudChain::KnnQuery(NanoMapKnnArgs const &args) const {
       first_frame_id = i->vertex->frame_id_;
       first_sigma_rdf = sigma_rdf;
       first_search_position_rdf = search_position_rdf;
+      first_velocity_rdf = velocity_rdf;
     }
 
     // if free, do NN and return
@@ -183,6 +189,7 @@ StructuredPointCloudChain::KnnQuery(NanoMapKnnArgs const &args) const {
       }
       reply.fov_status = fov_status;
       reply.frame_id = i->vertex->frame_id_;
+      reply.velocity_in_frame_id = velocity_rdf;
       reply.query_point_in_current_rdf = _body_to_rdf * args.query_point_current_body_frame;
       reply.query_point_in_frame_id = search_position_rdf;
       reply.closest_points_in_frame_id = return_points;
@@ -223,6 +230,7 @@ StructuredPointCloudChain::KnnQuery(NanoMapKnnArgs const &args) const {
   // query is not found
   reply.fov_status = first_fov_status;
   reply.frame_id = first_frame_id;
+  reply.velocity_in_frame_id = first_velocity_rdf;
   reply.query_point_in_current_rdf = _body_to_rdf * args.query_point_current_body_frame;
   reply.query_point_in_frame_id = first_search_position_rdf;
   reply.closest_points_in_frame_id = return_points;

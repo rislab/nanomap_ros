@@ -19,6 +19,7 @@ typedef pcl::PointCloud<pcl::PointXYZ>::Ptr PointCloudPtr;
 #define NANOMAP_DEBUG_PRINT false
 
 struct NanoMapKnnArgs {
+  Vector3 velocity_current_body_frame;
   Vector3 query_point_current_body_frame;
   Vector3 axis_aligned_linear_covariance;
   bool early_exit;
@@ -63,6 +64,7 @@ struct NanoMapKnnReply {
   uint32_t frame_id;
   Vector3 query_point_in_current_rdf;
   Vector3 query_point_in_frame_id;
+  Vector3 velocity_in_frame_id;
   std::vector<Vector3> closest_points_in_frame_id;
   Vector3 axis_aligned_linear_covariance;
   uint32_t query_depth;
