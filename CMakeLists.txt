@@ -22,6 +22,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   pcl_ros
   parameter_utils
+  tf2_sensor_msgs
 )
 
 find_package(Eigen3 REQUIRED)

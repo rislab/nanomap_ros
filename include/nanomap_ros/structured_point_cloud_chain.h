@@ -1,6 +1,7 @@
 #ifndef STRUCTURED_POINT_CLOUD_CHAIN_H
 #define STRUCTURED_POINT_CLOUD_CHAIN_H
 
+#include <deque>
 #include <nanomap_ros/nanomap_types.h>
 #include <nanomap_ros/structured_point_cloud.h>
 
